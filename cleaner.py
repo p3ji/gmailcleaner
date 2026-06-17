@@ -141,27 +141,24 @@ def build_search_criterion():
         console.print(f"[dim]Adding filter: From {sender}[/dim]")
         
     if choice in ["5", "6"]:
-        # Use specific multi-word phrases to avoid matching promotional emails
-        # e.g. "40% off your purchase!" would match "purchase" alone, but NOT "order confirmation"
+        # We include "receipt" broadly to catch "receipt optometry", etc.
+        # We still avoid single words like "purchase" or "order" to prevent matching promotional ads.
         criteria.append(
             'OR SUBJECT "order confirmation" '
-            'OR SUBJECT "order receipt" '
             'OR SUBJECT "your order" '
-            'OR SUBJECT "your receipt" '
-            'OR SUBJECT "payment receipt" '
             'OR SUBJECT "payment confirmation" '
             'OR SUBJECT "shipping confirmation" '
             'OR SUBJECT "purchase confirmation" '
             'OR SUBJECT "invoice" '
-            'SUBJECT "receipt for"'
+            'SUBJECT "receipt"'
         )
         # Exclude emails that already have the target label (Gmail IMAP extension)
-        skip_label = Prompt.ask("Exclude emails already labeled as", default="receipts")
+        skip_label = Prompt.ask("Skip emails that already have this label (press Enter to accept default, or clear it to process all)", default="receipts")
         if skip_label:
             criteria.append(f'NOT X-GM-LABELS "{skip_label}"')
             console.print(f"[dim]Adding filter: Receipts & order confirmations, skipping emails already labeled '{skip_label}'[/dim]")
         else:
-            console.print("[dim]Adding filter: Receipts & order confirmations (specific phrases only, excludes promos)[/dim]")
+            console.print("[dim]Adding filter: Receipts & order confirmations[/dim]")
         
     # Combine list into space-separated string
     return " ".join(criteria)
