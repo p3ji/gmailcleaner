@@ -153,8 +153,9 @@ def build_search_criterion():
             'SUBJECT "receipt"'
         )
         # Exclude emails that already have the target label (Gmail IMAP extension)
-        skip_label = Prompt.ask("Skip emails that already have this label (press Enter to accept default, or clear it to process all)", default="receipts")
-        if skip_label:
+        skip_labeled = Prompt.ask("Skip emails that already have this label (Y/N)", default="Y")
+        if skip_labeled.upper() == "Y":
+            skip_label = "receipts"
             criteria.append(f'NOT X-GM-LABELS "{skip_label}"')
             console.print(f"[dim]Adding filter: Receipts & order confirmations, skipping emails already labeled '{skip_label}'[/dim]")
         else:
